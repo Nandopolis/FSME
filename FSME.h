@@ -22,6 +22,7 @@ public:
 	Transition(FSME_PF_EV, uint8_t);
 	Transition();
 
+	void setTransition(FSME_PF_EV, uint8_t);
 	void setEvent(FSME_PF_EV);
 	void setNextState(uint8_t);
 	uint8_t runEvent(void);
@@ -40,6 +41,7 @@ public:
 	State(FSME_PF, uint8_t, Transition *);
 	State();
 
+	void setState(FSME_PF, Transition *, uint8_t);
 	void setAction(FSME_PF Action);
 	void setTransitions(Transition *, uint8_t);
 	void runAction();

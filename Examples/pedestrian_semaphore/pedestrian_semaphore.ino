@@ -55,33 +55,20 @@ void setup() {
   digitalWrite(PED_GREEN, 0);
   digitalWrite(PED_RED, 0);
 
-  cgnp_trans[0].setEvent(isPedWaiting);
-  cgnp_trans[0].setNextState(CARS_GREEN_PED_WAIT);
-  cgnp_trans[1].setEvent(timeOut);
-  cgnp_trans[1].setNextState(CARS_GREEN_INT);
-  cgi_trans[0].setEvent(isPedWaiting);
-  cgi_trans[0].setNextState(CARS_YELLOW);
-  cgpw_trans[0].setEvent(timeOut);
-  cgpw_trans[0].setNextState(CARS_YELLOW);
-  cy_trans[0].setEvent(timeOut);
-  cy_trans[0].setNextState(CARS_RED_PED_WALK);
-  crpw_trans[0].setEvent(timeOut);
-  crpw_trans[0].setNextState(CARS_RED_PED_FLASH);
-  crpf_trans[0].setEvent(enoughFlashes);
-  crpf_trans[0].setNextState(CARS_GREEN_NO_PED);
+  cgnp_trans[0].setTransition(isPedWaiting, CARS_GREEN_PED_WAIT);
+  cgnp_trans[1].setTransition(timeOut, CARS_GREEN_INT);
+  cgi_trans[0].setTransition(isPedWaiting, CARS_YELLOW);
+  cgpw_trans[0].setTransition(timeOut, CARS_YELLOW);
+  cy_trans[0].setTransition(timeOut, CARS_RED_PED_WALK);
+  crpw_trans[0].setTransition(timeOut, CARS_RED_PED_FLASH);
+  crpf_trans[0].setTransition(enoughFlashes, CARS_GREEN_NO_PED);
 
-  sem_states[CARS_GREEN_NO_PED].setAction(carGreen);
-  sem_states[CARS_GREEN_NO_PED].setTransitions(cgnp_trans, 2);
-  sem_states[CARS_GREEN_INT].setAction(carGreen);
-  sem_states[CARS_GREEN_INT].setTransitions(cgi_trans, 1);
-  sem_states[CARS_GREEN_PED_WAIT].setAction(pedWaiting);
-  sem_states[CARS_GREEN_PED_WAIT].setTransitions(cgpw_trans, 1);
-  sem_states[CARS_YELLOW].setAction(carYellow);
-  sem_states[CARS_YELLOW].setTransitions(cy_trans, 1);
-  sem_states[CARS_RED_PED_WALK].setAction(pedWalk);
-  sem_states[CARS_RED_PED_WALK].setTransitions(crpw_trans, 1);
-  sem_states[CARS_RED_PED_FLASH].setAction(pedFlash);
-  sem_states[CARS_RED_PED_FLASH].setTransitions(crpf_trans, 1);
+  sem_states[CARS_GREEN_NO_PED].setState(carGreen, cgnp_trans, 2);
+  sem_states[CARS_GREEN_INT].setState(carGreen, cgi_trans, 1);
+  sem_states[CARS_GREEN_PED_WAIT].setState(pedWaiting, cgpw_trans, 1);
+  sem_states[CARS_YELLOW].setState(carYellow, cy_trans, 1);
+  sem_states[CARS_RED_PED_WALK].setState(pedWalk, crpw_trans, 1);
+  sem_states[CARS_RED_PED_FLASH].setState(pedFlash, crpf_trans, 1);
 
   sem.setStates(sem_states, 6);
   sem.setInitialState(CARS_GREEN_NO_PED);

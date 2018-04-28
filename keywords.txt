@@ -14,8 +14,10 @@ Transition				KEYWORD1
 # Methods and Functions (KEYWORD2)
 #######################################
 
+setTransition			KEYWORD2
 setEvent				KEYWORD2
 setNextState			KEYWORD2
+setState				KEYWORD2
 setAction				KEYWORD2
 setTransitions			KEYWORD2
 setInitialState			KEYWORD2

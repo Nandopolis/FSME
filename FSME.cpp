@@ -18,6 +18,11 @@ Transition::Transition() {
 	this->NextState = 0;
 }
 
+void Transition::setTransition(FSME_PF_EV Event, uint8_t NextState) {
+	this->Event = Event;
+	this->NextState = NextState;
+}
+
 void Transition::setEvent(FSME_PF_EV Event) {
 	this->Event = Event;
 }
@@ -51,6 +56,12 @@ State::State() {
 	this->Action = 0;
 	this->TransNO = 0;
 	this->Trans = 0;
+}
+
+void State::setState(FSME_PF Action, Transition *Trans, uint8_t TransNO) {
+	this->Action = Action;
+	this->Trans = Trans;
+	this->TransNO = TransNO;
 }
 
 void State::setAction(FSME_PF Action) {
