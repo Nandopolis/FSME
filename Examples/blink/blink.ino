@@ -12,8 +12,8 @@ enum states {
 // declaration of the FSM, states and transitions
 FSME fsm;
 State states[2]; // you need to declare an array of states
-Transition s0_trans; // normally you declare an array of transitions,
-Transition s1_trans; 
+Transition *s0_trans[1]; // normally you declare an array of pointers to transitions,
+Transition *s1_trans[1]; // even if there is only 1 posible transition
 
 // a variable used for timing
 uint32_t temp;
@@ -35,18 +35,22 @@ void setup()
   
   // setting up the FSM
   Serial.println("setting up the fsm...");
-  
-  s0_trans.setEvent(timeOut); // set a pointer to an event function that defines when the transition should happen
-  s0_trans.setNextState(s1);  // pass the next state that should be set if the transition is triggered
-  s1_trans.setEvent(timeOut); // the same for all transitions
-  s1_trans.setNextState(s0);
 
-  states[s0].setAction(turnOn); // pass a pointer to an action function that will be running while the state is active
-  states[s0].setTransitions(&s0_trans, 1); // pass an array of posible transitions from that state, and the number of transitions
-  states[s1].setAction(turnOff); // the same for all states
-  states[s1].setTransitions(&s1_trans, 1);
+  // declare an event transition (EvnTransition)
+  // the first argument is a pointer to an event function that defines when the transition should happen
+  // the second argument is the next state that should be set if the transition is triggered
+  // *** note that its a timed transition, you can declare a time transition instead:
+  // *** s0_trans[0] = new TimeTransition(time_out_in_miliseconds, s1);
+  s0_trans[0] = new EvnTransition(timeOut, s1);
+  s1_trans[0] = new EvnTransition(timeOut, s0);  // the same for all transitions
   
-  fsm.setStates(states, 2); // pass an array of states tht conform the FSM, and the number of states
+  states[s0].setAction(turnOn); // pass a pointer to an action function that will be running while the state is active
+  states[s0].setTransitions(s0_trans, 1); // pass an array of posible transitions from that state, and the number of transitions
+  states[s1].setAction(turnOff); // the same for all states
+  states[s1].setTransitions(s1_trans, 1); // you can assign both action and transitions with: 
+                                          // states[s1].setState(turnOff, s1_trans, 1);
+  
+  fsm.setStates(states, 2); // pass an array of states that conform the FSM, and the number of states
   fsm.setInitialState(s0); // set the initial state
 /*
   Serial.print("timeOut pointer: ");
