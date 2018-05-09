@@ -8,35 +8,35 @@
 //#include "Arduino.h"
 #include "FSME.h"
 
-Transition::Transition(FSME_PF_EV Event, uint8_t NextState) {
-	this->Event = Event;
-	this->NextState = NextState;
-}
-
-Transition::Transition() {
-	this->Event = 0;
-	this->NextState = 0;
-}
-
-void Transition::setTransition(FSME_PF_EV Event, uint8_t NextState) {
-	this->Event = Event;
-	this->NextState = NextState;
-}
-
-void Transition::setEvent(FSME_PF_EV Event) {
-	this->Event = Event;
-}
-
 void Transition::setNextState(uint8_t NextState) {
 	this->NextState = NextState;
 }
 
-uint8_t Transition::runEvent(void) {
-	return this->Event();
-}
-
 uint8_t Transition::getNextState(void) {
 	return this->NextState;
+}
+
+EvnTransition::EvnTransition(FSME_PF_EV Event, uint8_t NextState) {
+	this->Event = Event;
+	this->setNextState(NextState);
+}
+
+EvnTransition::EvnTransition() {
+	this->Event = 0;
+	this->setNextState(0);
+}
+
+void EvnTransition::setEvnTransition(FSME_PF_EV Event, uint8_t NextState) {
+	this->Event = Event;
+	this->setNextState(NextState);
+}
+
+void EvnTransition::setEvent(FSME_PF_EV Event) {
+	this->Event = Event;
+}
+
+uint8_t EvnTransition::runEvent(void) {
+	return this->Event();
 }
 /*
 void Transition::serialPrint(void) {
@@ -46,7 +46,34 @@ void Transition::serialPrint(void) {
 	Serial.println(this->NextState);
 }
 */
-State::State(FSME_PF Action, uint8_t TransNO, Transition *Trans) {
+TimeTransition::TimeTransition(uint16_t TimeOut, uint8_t NextState) {
+	this->Active = 1;
+	this->TimeOut = TimeOut;
+	this->setNextState(NextState);
+}
+
+TimeTransition::TimeTransition() {
+	this->Active = 1;
+	this->TimeOut = 0xFFFF;
+	this->setNextState(0);
+}
+
+void TimeTransition::setTimeTransition(uint16_t TimeOut, uint8_t NextState) {
+	this->Active = 1;
+	this->TimeOut = TimeOut;
+	this->setNextState(NextState);
+}
+
+uint8_t TimeTransition::runEvent(void) {
+	uint32_t actual_time = actualTime();
+	if (this->Active) {
+		this->Active = 0;
+		this->InitialTime = actual_time;
+	}
+	return (actual_time - this->InitialTime >= this->TimeOut);
+}
+
+State::State(FSME_PF Action, uint8_t TransNO, Transition **Trans) {
 	this->Action = Action;
 	this->TransNO = TransNO;
 	this->Trans = Trans;
@@ -58,7 +85,7 @@ State::State() {
 	this->Trans = 0;
 }
 
-void State::setState(FSME_PF Action, Transition *Trans, uint8_t TransNO) {
+void State::setState(FSME_PF Action, Transition **Trans, uint8_t TransNO) {
 	this->Action = Action;
 	this->Trans = Trans;
 	this->TransNO = TransNO;
@@ -68,16 +95,23 @@ void State::setAction(FSME_PF Action) {
 	this->Action = Action;
 }
 
-void State::setTransitions(Transition *Trans, uint8_t TransNO) {
+void State::setTransitions(Transition **Trans, uint8_t TransNO) {
 	this->Trans = Trans;
 	this->TransNO = TransNO;
+}
+
+void State::setActive(void) {
+	uint8_t i;
+	for (i = 0; i < this->TransNO; i++) {
+		this->Trans[i]->Active = 1;
+	}
 }
 
 void State::runAction(void) {
 	this->Action();
 }
 
-Transition * State::getTransitions(void) {
+Transition ** State::getTransitions(void) {
 	return (this->Trans);
 }
 
@@ -99,7 +133,8 @@ void State::serialPrint(void) {
 	} while (++i < this->TransNO);
 }
 */
-FSME::FSME(uint8_t Enable, uint8_t CurrentState, uint8_t StatesNO, State *States, uint8_t TransNO, Transition *Trans) {
+FSME::FSME(uint8_t Enable, uint8_t CurrentState, uint8_t StatesNO, \
+			State *States, uint8_t TransNO, Transition **Trans) {
 	this->Enable = Enable;
 	this->CurrentState = CurrentState;
 	this->StatesNO = StatesNO;
@@ -138,9 +173,10 @@ void FSME::updateState(void) {
 	_n = this->TransNO;
 
 	for (_i = 0; _i < _n; _i++) {
-		if (_t[_i].runEvent() == 1) {
-			this->CurrentState = _t[_i].getNextState();
+		if (_t[_i]->runEvent() == 1) {
+			this->CurrentState = _t[_i]->getNextState();
 			_s = &(this->States[this->CurrentState]);
+			_s->setActive();
 			this->Trans = _s->getTransitions();
 			this->TransNO = _s->getTransitionsNumber();
 			this->StateChanged = 1;

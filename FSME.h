@@ -10,23 +10,48 @@
 
 #include <stdint.h>
 
+extern uint32_t actualTime(void);
+
 typedef void(*FSME_PF) (void);
 typedef uint8_t(*FSME_PF_EV) (void);
 
 class Transition {
 private:
-	FSME_PF_EV Event;
 	uint8_t NextState;
 
 public:
-	Transition(FSME_PF_EV, uint8_t);
-	Transition();
-
-	void setTransition(FSME_PF_EV, uint8_t);
-	void setEvent(FSME_PF_EV);
+	uint8_t Active;
 	void setNextState(uint8_t);
-	uint8_t runEvent(void);
+	virtual uint8_t runEvent(void);
 	uint8_t getNextState(void);
+};
+
+class EvnTransition: public Transition {
+private:
+	FSME_PF_EV Event;
+
+public:
+	EvnTransition(FSME_PF_EV, uint8_t);
+	EvnTransition();
+
+	void setEvnTransition(FSME_PF_EV, uint8_t);
+	void setEvent(FSME_PF_EV);
+	uint8_t runEvent(void);
+
+	//void serialPrint(void);
+};
+
+class TimeTransition: public Transition {
+private:
+	uint16_t TimeOut;
+	uint32_t InitialTime;
+
+public:
+	TimeTransition(uint16_t, uint8_t);
+	TimeTransition();
+
+	void setTimeTransition(uint16_t, uint8_t);
+	uint8_t runEvent(void);
 
 	//void serialPrint(void);
 };
@@ -35,17 +60,18 @@ class State {
 private:
 	FSME_PF Action;
 	uint8_t TransNO;
-	Transition *Trans;
+	Transition **Trans;
 
 public:
-	State(FSME_PF, uint8_t, Transition *);
+	State(FSME_PF, uint8_t, Transition **);
 	State();
 
-	void setState(FSME_PF, Transition *, uint8_t);
+	void setState(FSME_PF, Transition **, uint8_t);
 	void setAction(FSME_PF Action);
-	void setTransitions(Transition *, uint8_t);
+	void setTransitions(Transition **, uint8_t);
+	void setActive();
 	void runAction();
-	Transition * getTransitions(void);
+	Transition ** getTransitions(void);
 	uint8_t getTransitionsNumber(void);
 
 	//void serialPrint(void);
@@ -53,7 +79,7 @@ public:
 
 class FSME {
 private:
-	Transition *_t = 0;
+	Transition **_t = 0;
 	State *_s = 0;
 	uint8_t Enable;
 	uint8_t CurrentState;
@@ -61,13 +87,13 @@ private:
 	uint8_t StateChanged;
 	State *States;
 	uint8_t TransNO;
-	Transition *Trans;
+	Transition **Trans;
 
 	void updateState(void);
 	void action(void);
 
 public:
-	FSME(uint8_t, uint8_t, uint8_t, State *, uint8_t, Transition *);
+	FSME(uint8_t, uint8_t, uint8_t, State *, uint8_t, Transition **);
 	FSME();
 
 	void setInitialState(uint8_t CurState);
