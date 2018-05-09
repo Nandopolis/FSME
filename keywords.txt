@@ -9,14 +9,13 @@
 FSME					KEYWORD1
 State					KEYWORD1
 Transition				KEYWORD1
+TimeTransition			KEYWORD1
+EvnTransition			KEYWORD1
 
 #######################################
 # Methods and Functions (KEYWORD2)
 #######################################
 
-setTransition			KEYWORD2
-setEvent				KEYWORD2
-setNextState			KEYWORD2
 setState				KEYWORD2
 setAction				KEYWORD2
 setTransitions			KEYWORD2
