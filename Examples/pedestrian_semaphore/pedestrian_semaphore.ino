@@ -38,10 +38,6 @@ void carYellowLoop(void);
 void pedWalkLoop(void);
 void pedFlashLoop(void);
 
-uint32_t actualTime(void) {
-  return millis();
-}
-
 void setup() {
   // put your setup code here, to run once:
   pinMode(CAR_GREEN, OUTPUT);
