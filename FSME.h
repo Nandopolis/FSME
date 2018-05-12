@@ -10,22 +10,13 @@
  * type of transition, a timed transition.
  * 
  * For use refer to examples in Examples folder, this examples are implemented
- * on Arduino, but the lybrary is written in C++ so it should be possible to use
- * it on other environments.
+ * on Arduino
  */
 
 #ifndef FSME_H_
 #define FSME_H_
 
 #include <stdint.h>
-
-/**
- * @brief External function to acquire the time in ms
- * 
- * This function must be implemented on the application
- * since it is hardware dependent
- */
-extern uint32_t actualTime(void);
 
 typedef void (*FSME_PF)(void);
 typedef uint8_t (*FSME_PF_EV)(void);

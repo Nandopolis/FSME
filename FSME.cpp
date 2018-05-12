@@ -5,7 +5,7 @@
  *      Author: Nandopolis
  */
 
-//#include "Arduino.h"
+#include "Arduino.h"
 #include "FSME.h"
 
 void Transition::setNextState(uint8_t NextState) {
@@ -39,7 +39,7 @@ TimeTransition::TimeTransition(uint16_t TimeOut, uint8_t NextState) {
 }
 
 uint8_t TimeTransition::runEvent(void) {
-	uint32_t actual_time = actualTime();
+	uint32_t actual_time = millis();
 	if (this->Active) {
 		this->Active = 0;
 		this->InitialTime = actual_time;
