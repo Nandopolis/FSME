@@ -44,9 +44,9 @@ void setup()
   s0_trans[0] = new EvnTransition(timeOut, s1);
   s1_trans[0] = new EvnTransition(timeOut, s0);  // the same for all transitions
   
-  states[s0].setAction(turnOn); // pass a pointer to an action function that will be running while the state is active
+  states[s0].setAction(turnOn);           // pass a pointer to an action function that will be running while the state is active
   states[s0].setTransitions(s0_trans, 1); // pass an array of posible transitions from that state, and the number of transitions
-  states[s1].setAction(turnOff); // the same for all states
+  states[s1].setAction(turnOff);          // the same for all states
   states[s1].setTransitions(s1_trans, 1); // you can assign both action and transitions with: 
                                           // states[s1].setState(turnOff, s1_trans, 1);
   
@@ -76,7 +76,7 @@ void loop()
 // this will be called every time the transition associated with this event is evaluated
 // this function doesn't take arguments and it must return an uint8_t
 // if the function returns 1, the transition takes place
-// if the function returns 0, ther is no transition
+// if the function returns 0, there is no transition
 uint8_t timeOut(void){
 	if (millis() - temp > 500) {
 		temp = millis();
